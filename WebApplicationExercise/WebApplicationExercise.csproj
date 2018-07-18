@@ -223,6 +223,10 @@
     <Compile Include="Migrations\201807180757482_RemoveOrder_IsVisible.Designer.cs">
       <DependentUpon>201807180757482_RemoveOrder_IsVisible.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201807181157117_Product_NameMaxLength.cs" />
+    <Compile Include="Migrations\201807181157117_Product_NameMaxLength.Designer.cs">
+      <DependentUpon>201807181157117_Product_NameMaxLength.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\Product.cs" />
@@ -312,6 +316,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201807180757482_RemoveOrder_IsVisible.resx">
       <DependentUpon>201807180757482_RemoveOrder_IsVisible.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201807181157117_Product_NameMaxLength.resx">
+      <DependentUpon>201807181157117_Product_NameMaxLength.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

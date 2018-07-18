@@ -10,7 +10,7 @@ namespace WebApplicationExercise.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
-        public string Name { get; set; }
+        [MaxLength(100)] public string Name { get; set; }
 
         public double Price { get; set; }
 
