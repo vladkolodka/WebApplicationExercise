@@ -103,11 +103,6 @@ namespace WebApplicationExercise.Services
             return Mapper.Map<List<OrderModel>>(await _manager.IsCustomerVisible(orders).ToListAsync());
         }
 
-        private IQueryable<Order> AddClause(IQueryable<Order> query)
-        {
-            return query.Where(o => o.Customer == "123");
-        }
-
         /// <summary>
         ///     Delete order
         /// </summary>
@@ -123,6 +118,11 @@ namespace WebApplicationExercise.Services
             Db.Entry(order).State = EntityState.Deleted;
 
             await Db.SaveChangesAsync();
+        }
+
+        private IQueryable<Order> AddClause(IQueryable<Order> query)
+        {
+            return query.Where(o => o.Customer == "123");
         }
 
         private static IQueryable<Order> FilterByCustomer(IQueryable<Order> orders, string customerName)
