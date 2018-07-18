@@ -70,12 +70,20 @@ namespace WebApplicationExercise.Services
 
             Mapper.Map(order, dbOrder);
 
-            if (order.Products.Any() && dbOrder.Products.Any())
+            if (order.Products != null && dbOrder.Products != null && order.Products.Any() && dbOrder.Products.Any())
             {
-                var products = order.Products?.ToDictionary(p => p.Id);
+                var modelIds = new HashSet<Guid>(order.Products.Select(p => p.Id));
 
-                foreach (var p in dbOrder.Products.Where(p => products.ContainsKey(p.Id)))
-                    Mapper.Map(products[p.Id], p);
+                Db.Products.RemoveRange(dbOrder.Products.Where(p => !modelIds.Contains(p.Id)));
+
+                var dbProducts = dbOrder.Products.ToDictionary(p => p.Id);
+
+                var existingProducts = order.Products.Where(p => dbProducts.ContainsKey(p.Id)).ToDictionary(p => p.Id);
+
+                foreach (var p in existingProducts) Mapper.Map(p.Value, dbProducts[p.Key]);
+
+                dbOrder.Products.AddRange(
+                    Mapper.Map<IEnumerable<Product>>(order.Products.Where(pm => !dbProducts.ContainsKey(pm.Id))));
             }
 
             await Db.SaveChangesAsync();
