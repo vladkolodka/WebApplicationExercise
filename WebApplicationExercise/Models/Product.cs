@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Newtonsoft.Json;
 
 namespace WebApplicationExercise.Models
 {
@@ -15,6 +14,6 @@ namespace WebApplicationExercise.Models
 
         public double Price { get; set; }
 
-        [JsonIgnore] public Order Order { get; set; }
+        public Order Order { get; set; }
     }
 }

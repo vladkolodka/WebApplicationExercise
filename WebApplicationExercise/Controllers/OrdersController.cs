@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Http;
-using WebApplicationExercise.Models;
+using WebApplicationExercise.Dto;
 using WebApplicationExercise.Services.Interfaces;
 
 namespace WebApplicationExercise.Controllers
@@ -33,9 +33,9 @@ namespace WebApplicationExercise.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("{orderId}")]
-        public Task<Order> GetOrder(Guid orderId)
+        public async Task<OrderModel> GetOrder(Guid orderId)
         {
-            return _orderService.Single(orderId);
+            return await _orderService.Single(orderId);
         }
 
         /// <summary>
@@ -47,9 +47,10 @@ namespace WebApplicationExercise.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route]
-        public Task<List<Order>> GetOrders(DateTime? from = null, DateTime? to = null, string customerName = null)
+        public async Task<List<OrderModel>> GetOrders(DateTime? from = null, DateTime? to = null,
+            string customerName = null)
         {
-            return _orderService.All(from, to, customerName);
+            return await _orderService.All(from, to, customerName);
         }
 
         /// <summary>
@@ -59,9 +60,9 @@ namespace WebApplicationExercise.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route]
-        public Task<Order> SaveOrder([FromBody] Order order)
+        public async Task<OrderModel> SaveOrder([FromBody] OrderModel order)
         {
-            return _orderService.Save(order);
+            return await _orderService.Save(order);
         }
 
         /// <summary>
@@ -84,9 +85,9 @@ namespace WebApplicationExercise.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("{orderId}")]
-        public Task<Order> UpdateOrder(Guid orderId, [FromBody] Order order)
+        public async Task<OrderModel> UpdateOrder(Guid orderId, [FromBody] OrderModel order)
         {
-            return _orderService.Update(orderId, order);
+            return await _orderService.Update(orderId, order);
         }
     }
 }

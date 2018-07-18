@@ -13,10 +13,7 @@ namespace WebApplicationExercise.Models
 
         public DateTime CreatedDate { get; set; }
 
-        [MaxLength(100)]
-        public string Customer { get; set; }
-
-        public bool IsVisible { get; set; }
+        [MaxLength(100)] public string Customer { get; set; }
 
         public List<Product> Products { get; set; } = new List<Product>();
     }

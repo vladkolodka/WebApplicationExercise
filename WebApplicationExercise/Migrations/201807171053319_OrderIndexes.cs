@@ -1,8 +1,7 @@
+using System.Data.Entity.Migrations;
+
 namespace WebApplicationExercise.Migrations
 {
-    using System;
-    using System.Data.Entity.Migrations;
-    
     public partial class OrderIndexes : DbMigration
     {
         public override void Up()
@@ -11,11 +10,11 @@ namespace WebApplicationExercise.Migrations
             CreateIndex("dbo.Orders", "CreatedDate");
             CreateIndex("dbo.Orders", "Customer");
         }
-        
+
         public override void Down()
         {
-            DropIndex("dbo.Orders", new[] { "Customer" });
-            DropIndex("dbo.Orders", new[] { "CreatedDate" });
+            DropIndex("dbo.Orders", new[] {"Customer"});
+            DropIndex("dbo.Orders", new[] {"CreatedDate"});
             AlterColumn("dbo.Orders", "Customer", c => c.String());
         }
     }

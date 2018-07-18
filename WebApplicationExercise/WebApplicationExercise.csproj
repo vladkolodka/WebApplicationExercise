@@ -56,6 +56,9 @@
     <Reference Include="Autofac.Integration.WebApi, Version=4.2.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
       <HintPath>..\packages\Autofac.WebApi2.4.2.0\lib\net45\Autofac.Integration.WebApi.dll</HintPath>
     </Reference>
+    <Reference Include="AutoMapper, Version=7.0.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.7.0.1\lib\net45\AutoMapper.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
@@ -75,6 +78,9 @@
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Transactions" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -188,10 +194,15 @@
     <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Core\AutofacConfig.cs" />
     <Compile Include="Core\MainDataContext.cs" />
+    <Compile Include="Dto\OrderModel.cs" />
+    <Compile Include="Dto\ProductModel.cs" />
     <Compile Include="Filters\ExecutionTimeFilterAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Managers\CustomerManager.cs" />
+    <Compile Include="Managers\Interfaces\ICustomerManager.cs" />
+    <Compile Include="MappingProfiles\MainProfile.cs" />
     <Compile Include="Migrations\201807160732477_InitialCreate.cs" />
     <Compile Include="Migrations\201807160732477_InitialCreate.Designer.cs">
       <DependentUpon>201807160732477_InitialCreate.cs</DependentUpon>
@@ -207,6 +218,10 @@
     <Compile Include="Migrations\201807171053319_OrderIndexes.cs" />
     <Compile Include="Migrations\201807171053319_OrderIndexes.Designer.cs">
       <DependentUpon>201807171053319_OrderIndexes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201807180757482_RemoveOrder_IsVisible.cs" />
+    <Compile Include="Migrations\201807180757482_RemoveOrder_IsVisible.Designer.cs">
+      <DependentUpon>201807180757482_RemoveOrder_IsVisible.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Order.cs" />
@@ -294,6 +309,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201807171053319_OrderIndexes.resx">
       <DependentUpon>201807171053319_OrderIndexes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201807180757482_RemoveOrder_IsVisible.resx">
+      <DependentUpon>201807180757482_RemoveOrder_IsVisible.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

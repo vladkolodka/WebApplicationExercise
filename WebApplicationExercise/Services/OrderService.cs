@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using WebApplicationExercise.Core;
+using WebApplicationExercise.Dto;
+using WebApplicationExercise.Managers.Interfaces;
 using WebApplicationExercise.Models;
 using WebApplicationExercise.Services.Interfaces;
 
@@ -14,9 +17,13 @@ namespace WebApplicationExercise.Services
     /// </summary>
     public class OrderService : BaseService, IOrderService
     {
+        private readonly ICustomerManager _manager;
+
         /// <param name="db">Database context</param>
-        public OrderService(MainDataContext db) : base(db)
+        /// <param name="manager">Customer manager</param>
+        public OrderService(MainDataContext db, IMapper mapper, ICustomerManager manager) : base(db, mapper)
         {
+            _manager = manager;
         }
 
         /// <summary>
@@ -24,24 +31,28 @@ namespace WebApplicationExercise.Services
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
-        public Task<Order> Single(Guid orderId)
+        public async Task<OrderModel> Single(Guid orderId)
         {
             // single throws exception when entity doesnt exists.
-            return Db.Orders.Include(o => o.Products).AsNoTracking().FirstOrDefaultAsync(o => o.Id == orderId);
+            return Mapper.Map<OrderModel>(await Db.Orders.Include(o => o.Products).AsNoTracking()
+                .FirstOrDefaultAsync(o => o.Id == orderId));
         }
 
         /// <summary>
         ///     Create new order
         /// </summary>
-        /// <param name="order"></param>
+        /// <param name="orderModel"></param>
         /// <returns></returns>
-        public async Task<Order> Save(Order order)
+        public async Task<OrderModel> Save(OrderModel orderModel)
         {
+            var order = Mapper.Map<Order>(orderModel);
+            order.Products = Mapper.Map<List<Product>>(orderModel.Products);
+
             var savedOrder = Db.Orders.Add(order);
 
             await Db.SaveChangesAsync();
 
-            return savedOrder;
+            return Mapper.Map<OrderModel>(savedOrder);
         }
 
         /// <summary>
@@ -51,30 +62,25 @@ namespace WebApplicationExercise.Services
         /// <param name="order"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public async Task<Order> Update(Guid orderId, Order order)
+        public async Task<OrderModel> Update(Guid orderId, OrderModel order)
         {
             var dbOrder = await Db.Orders.Include(o => o.Products).FirstOrDefaultAsync(o => o.Id == orderId);
 
             if (dbOrder == null) throw new ArgumentException("Order not found");
 
-            dbOrder.IsVisible = order.IsVisible;
-            dbOrder.CreatedDate = order.CreatedDate;
-            dbOrder.Customer = order.Customer;
+            Mapper.Map(order, dbOrder);
 
-            if (dbOrder.Products.Any() && order.Products.Any())
+            if (order.Products.Any() && dbOrder.Products.Any())
             {
-                var products = order.Products.ToDictionary(p => p.Id);
+                var products = order.Products?.ToDictionary(p => p.Id);
 
                 foreach (var p in dbOrder.Products.Where(p => products.ContainsKey(p.Id)))
-                {
-                    p.Name = products[p.Id].Name;
-                    p.Price = products[p.Id].Price;
-                }
+                    Mapper.Map(products[p.Id], p);
             }
 
             await Db.SaveChangesAsync();
 
-            return dbOrder;
+            return Mapper.Map<OrderModel>(dbOrder);
         }
 
         /// <summary>
@@ -84,7 +90,7 @@ namespace WebApplicationExercise.Services
         /// <param name="to"></param>
         /// <param name="customerName"></param>
         /// <returns></returns>
-        public Task<List<Order>> All(DateTime? from, DateTime? to, string customerName)
+        public async Task<List<OrderModel>> All(DateTime? from, DateTime? to, string customerName)
         {
             var orders = Db.Orders.Include(o => o.Products).AsNoTracking();
 
@@ -94,7 +100,12 @@ namespace WebApplicationExercise.Services
             if (customerName != null)
                 orders = FilterByCustomer(orders, customerName);
 
-            return orders.Where(o => o.IsVisible).ToListAsync();
+            return Mapper.Map<List<OrderModel>>(await _manager.IsCustomerVisible(orders).ToListAsync());
+        }
+
+        private IQueryable<Order> AddClause(IQueryable<Order> query)
+        {
+            return query.Where(o => o.Customer == "123");
         }
 
         /// <summary>
