@@ -227,14 +227,21 @@
     <Compile Include="Migrations\201807181157117_Product_NameMaxLength.Designer.cs">
       <DependentUpon>201807181157117_Product_NameMaxLength.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201807261205247_RemoveIdDbGeneration.cs" />
+    <Compile Include="Migrations\201807261205247_RemoveIdDbGeneration.Designer.cs">
+      <DependentUpon>201807261205247_RemoveIdDbGeneration.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\ISequentialIdEntity.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\Product.cs" />
+    <Compile Include="Models\SequentialIdEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\BaseService.cs" />
     <Compile Include="Services\Interfaces\IOrderService.cs" />
     <Compile Include="Services\Logging\NLogger.cs" />
     <Compile Include="Services\OrderService.cs" />
+    <Compile Include="Utils\SequentialGuid.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-theme.css" />
@@ -319,6 +326,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201807181157117_Product_NameMaxLength.resx">
       <DependentUpon>201807181157117_Product_NameMaxLength.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201807261205247_RemoveIdDbGeneration.resx">
+      <DependentUpon>201807261205247_RemoveIdDbGeneration.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

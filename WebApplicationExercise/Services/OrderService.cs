@@ -46,7 +46,6 @@ namespace WebApplicationExercise.Services
         public async Task<OrderModel> Save(OrderModel orderModel)
         {
             var order = Mapper.Map<Order>(orderModel);
-            order.Products = Mapper.Map<List<Product>>(orderModel.Products);
 
             var savedOrder = Db.Orders.Add(order);
 
@@ -56,39 +55,25 @@ namespace WebApplicationExercise.Services
         }
 
         /// <summary>
-        ///     Update order details
+        ///     Update order details v2
         /// </summary>
         /// <param name="orderId"></param>
-        /// <param name="order"></param>
+        /// <param name="orderModel"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public async Task<OrderModel> Update(Guid orderId, OrderModel order)
+        public async Task<OrderModel> Update(Guid orderId, OrderModel orderModel)
         {
             var dbOrder = await Db.Orders.Include(o => o.Products).FirstOrDefaultAsync(o => o.Id == orderId);
 
             if (dbOrder == null) throw new ArgumentException("Order not found");
 
-            Mapper.Map(order, dbOrder);
+            Db.Orders.Remove(dbOrder);
 
-            if (order.Products != null && dbOrder.Products != null && order.Products.Any() && dbOrder.Products.Any())
-            {
-                var modelIds = new HashSet<Guid>(order.Products.Select(p => p.Id));
-
-                Db.Products.RemoveRange(dbOrder.Products.Where(p => !modelIds.Contains(p.Id)));
-
-                var dbProducts = dbOrder.Products.ToDictionary(p => p.Id);
-
-                var existingProducts = order.Products.Where(p => dbProducts.ContainsKey(p.Id)).ToDictionary(p => p.Id);
-
-                foreach (var p in existingProducts) Mapper.Map(p.Value, dbProducts[p.Key]);
-
-                dbOrder.Products.AddRange(
-                    Mapper.Map<IEnumerable<Product>>(order.Products.Where(pm => !dbProducts.ContainsKey(pm.Id))));
-            }
+            var newDbOrder = Db.Orders.Add(Mapper.Map<Order>(orderModel));
 
             await Db.SaveChangesAsync();
 
-            return Mapper.Map<OrderModel>(dbOrder);
+            return Mapper.Map<OrderModel>(newDbOrder);
         }
 
         /// <summary>

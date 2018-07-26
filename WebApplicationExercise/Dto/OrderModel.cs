@@ -8,7 +8,8 @@ namespace WebApplicationExercise.Dto
     {
         public Guid Id { get; set; }
 
-        [Required] public string CustomerName { get; set; }
+        [Required]
+        public string CustomerName { get; set; }
 
         public DateTime CreatedDate { get; set; }
 

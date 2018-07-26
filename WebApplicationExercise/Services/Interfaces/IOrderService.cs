@@ -11,6 +11,6 @@ namespace WebApplicationExercise.Services.Interfaces
         Task<OrderModel> Save(OrderModel orderModel);
         Task<List<OrderModel>> All(DateTime? from, DateTime? to, string customerName);
         Task Delete(Guid orderId);
-        Task<OrderModel> Update(Guid orderId, OrderModel order);
+        Task<OrderModel> Update(Guid orderId, OrderModel orderModel);
     }
 }

@@ -1,16 +1,11 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace WebApplicationExercise.Models
 {
-    public class Product
+    public class Product : SequentialIdEntity
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid Id { get; set; }
-
-        [MaxLength(100)] public string Name { get; set; }
+        [MaxLength(100)]
+        public string Name { get; set; }
 
         public double Price { get; set; }
 
