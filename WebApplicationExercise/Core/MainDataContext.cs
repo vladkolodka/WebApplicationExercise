@@ -23,7 +23,6 @@ namespace WebApplicationExercise.Core
             modelBuilder.Entity<Order>().HasIndex(o => o.Customer).IsClustered(false);
             modelBuilder.Entity<Order>().HasIndex(o => o.CreatedDate).IsClustered(false);
 
-
             base.OnModelCreating(modelBuilder);
         }
 
