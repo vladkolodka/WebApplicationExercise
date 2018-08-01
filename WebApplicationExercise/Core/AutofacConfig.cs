@@ -50,6 +50,7 @@
 
             builder.RegisterType<CustomerManager>().As<ICustomerManager>();
             builder.RegisterType<OrderService>().As<IOrderService>();
+            builder.RegisterType<CurrencyConverterService>().As<ICurrencyConverterService>().SingleInstance();
 
             builder.RegisterModule<NLogModule>();
 

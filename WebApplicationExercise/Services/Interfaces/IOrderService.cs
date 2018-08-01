@@ -10,6 +10,7 @@
     {
         Task<List<OrderModel>> All(
             int pageNumber,
+            string currency,
             string sortOrder,
             DateTime? @from,
             DateTime? to,
@@ -19,7 +20,7 @@
 
         Task<OrderModel> Save(OrderModel orderModel);
 
-        Task<OrderModel> Single(Guid orderId);
+        Task<OrderModel> Single(Guid orderId, string currency);
 
         Task<OrderModel> Update(Guid orderId, OrderModel orderModel);
     }

@@ -42,19 +42,21 @@
         /// <summary>
         ///     Get single order
         /// </summary>
-        /// <param name="orderId"></param>
+        /// <param name="orderId">Order identifier</param>
+        /// <param name="currency">Convert to currency, ex: UAH</param>
         /// <returns></returns>
         [HttpGet]
         [Route("{orderId}")]
-        public async Task<OrderModel> GetOrder(Guid orderId)
+        public async Task<OrderModel> GetOrder(Guid orderId, string currency = null)
         {
-            return await this.orderService.Single(orderId);
+            return await this.orderService.Single(orderId, currency);
         }
 
         /// <summary>
         ///     Get all orders with optional filtering by date and customer name
         /// </summary>
         /// <param name="pageNumber">Page number</param>
+        /// <param name="currency">Convert to currency, ex: UAH</param>
         /// <param name="sortOrder">customer_name[_desc] ; created_date[_desc]</param>
         /// <param name="from">Date from</param>
         /// <param name="to">Date to</param>
@@ -63,13 +65,14 @@
         [HttpGet]
         [Route]
         public async Task<List<OrderModel>> GetOrders(
-            int pageNumber,
+            int pageNumber = 0,
+            string currency = null,
             string sortOrder = null,
             DateTime? from = null,
             DateTime? to = null,
             string customerName = null)
         {
-            return await this.orderService.All(pageNumber, sortOrder, from, to, customerName);
+            return await this.orderService.All(pageNumber, currency, sortOrder, from, to, customerName);
         }
 
         /// <summary>

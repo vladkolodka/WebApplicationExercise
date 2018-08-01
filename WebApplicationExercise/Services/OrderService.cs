@@ -22,21 +22,30 @@
         // TODO to ask if it should be in the config
         private const int OrdersCountOnPage = 2;
 
+        private readonly ICurrencyConverterService currencyConverterService;
+
         private readonly ICustomerManager manager;
 
         /// <param name="db">Database context</param>
         /// <param name="mapper"></param>
         /// <param name="manager">Customer manager</param>
-        public OrderService(MainDataContext db, IMapper mapper, ICustomerManager manager)
+        /// <param name="currencyConverterService">Currency converter</param>
+        public OrderService(
+            MainDataContext db,
+            IMapper mapper,
+            ICustomerManager manager,
+            ICurrencyConverterService currencyConverterService)
             : base(db, mapper)
         {
             this.manager = manager;
+            this.currencyConverterService = currencyConverterService;
         }
 
         /// <summary>
         ///     Get all orders with optional filtering
         /// </summary>
         /// <param name="pageNumber"></param>
+        /// <param name="currency"></param>
         /// <param name="sortOrder"></param>
         /// <param name="from"></param>
         /// <param name="to"></param>
@@ -44,8 +53,9 @@
         /// <returns></returns>
         public async Task<List<OrderModel>> All(
             int pageNumber,
+            string currency,
             string sortOrder,
-            DateTime? from,
+            DateTime? @from,
             DateTime? to,
             string customerName)
         {
@@ -83,10 +93,16 @@
                     break;
             }
 
-            var request = await this.manager.IsCustomerVisible(orders).Skip(OrdersCountOnPage * pageNumber)
-                              .Take(OrdersCountOnPage).ToListAsync();
+            var result = this.Mapper.Map<List<OrderModel>>(
+                await this.manager.IsCustomerVisible(orders).Skip(OrdersCountOnPage * pageNumber)
+                    .Take(OrdersCountOnPage).ToListAsync());
 
-            return this.Mapper.Map<List<OrderModel>>(request);
+            if (currency != null)
+            {
+                await this.ConvertPrice(currency, result);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -129,12 +145,20 @@
         ///     Get order by id
         /// </summary>
         /// <param name="orderId"></param>
+        /// <param name="currency"></param>
         /// <returns></returns>
-        public async Task<OrderModel> Single(Guid orderId)
+        public async Task<OrderModel> Single(Guid orderId, string currency)
         {
             // single throws exception when entity doesnt exists.
-            return this.Mapper.Map<OrderModel>(
+            var result = this.Mapper.Map<OrderModel>(
                 await this.Db.Orders.Include(o => o.Products).AsNoTracking().FirstOrDefaultAsync(o => o.Id == orderId));
+
+            if (currency != null)
+            {
+                await this.ConvertPrice(currency, new[] { result });
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -170,6 +194,29 @@
         private static IQueryable<Order> FilterByDate(IQueryable<Order> orders, DateTime from, DateTime to)
         {
             return orders.Where(o => o.CreatedDate >= from && o.CreatedDate <= to);
+        }
+
+        /// <summary>
+        /// Convert (update in source) order's products price from USD to target currency
+        /// </summary>
+        /// <param name="targetCurrency"></param>
+        /// <param name="orders"></param>
+        private async Task ConvertPrice(string targetCurrency, IEnumerable<OrderModel> orders)
+        {
+            var targetPrice = await this.currencyConverterService.ConvertUsd(targetCurrency);
+
+            foreach (var order in orders)
+            {
+                if (order.Products == null)
+                {
+                    continue;
+                }
+
+                foreach (var product in order.Products)
+                {
+                    product.Price = product.Price * targetPrice;
+                }
+            }
         }
     }
 }

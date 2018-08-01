@@ -239,6 +239,8 @@
     <Compile Include="Models\SequentialIdEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\BaseService.cs" />
+    <Compile Include="Services\CurrencyConverterService.cs" />
+    <Compile Include="Services\Interfaces\ICurrencyConverterService.cs" />
     <Compile Include="Services\Interfaces\IOrderService.cs" />
     <Compile Include="Services\Logging\NLogger.cs" />
     <Compile Include="Services\OrderService.cs" />
