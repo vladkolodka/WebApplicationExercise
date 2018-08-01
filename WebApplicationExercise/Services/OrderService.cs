@@ -22,6 +22,7 @@ namespace WebApplicationExercise.Services
         private readonly ICustomerManager _manager;
 
         /// <param name="db">Database context</param>
+        /// <param name="mapper"></param>
         /// <param name="manager">Customer manager</param>
         public OrderService(MainDataContext db, IMapper mapper, ICustomerManager manager) : base(db, mapper)
         {
@@ -40,7 +41,7 @@ namespace WebApplicationExercise.Services
                 .FirstOrDefaultAsync(o => o.Id == orderId));
         }
 
-        /// <summary> 
+        /// <summary>
         ///     Create new order
         /// </summary>
         /// <param name="orderModel"></param>
@@ -82,11 +83,13 @@ namespace WebApplicationExercise.Services
         ///     Get all orders with optional filtering
         /// </summary>
         /// <param name="pageNumber"></param>
+        /// <param name="sortOrder"></param>
         /// <param name="from"></param>
         /// <param name="to"></param>
         /// <param name="customerName"></param>
         /// <returns></returns>
-        public async Task<List<OrderModel>> All(int pageNumber, DateTime? @from, DateTime? to, string customerName)
+        public async Task<List<OrderModel>> All(int pageNumber, string sortOrder, DateTime? from, DateTime? to,
+            string customerName)
         {
             var orders = Db.Orders.Include(o => o.Products).AsNoTracking();
 
@@ -96,11 +99,29 @@ namespace WebApplicationExercise.Services
             if (customerName != null)
                 orders = FilterByCustomer(orders, customerName);
 
+            // TODO consider convert to: orders = Dictionary<Delegate>[](orders) in case if new fields will be added
+            switch (sortOrder?.ToLower())
+            {
+                case "customer_name":
+                    orders = orders.OrderBy(o => o.Customer);
+                    break;
+
+                case "created_date":
+                    orders = orders.OrderBy(o => o.CreatedDate);
+                    break;
+                case "customer_name_desc":
+                    orders = orders.OrderByDescending(o => o.Customer);
+                    break;
+
+                case "created_date_desc":
+                    orders = orders.OrderByDescending(o => o.CreatedDate);
+                    break;
+                default:
+                    orders = orders.OrderBy(o => o.Id);
+                    break;
+            }
+
             var request = await _manager.IsCustomerVisible(orders)
-                
-                // TODO default OrderBy if not specified
-                .OrderBy(o => o.CreatedDate)
-                
                 .Skip(OrdersCountOnPage * pageNumber).Take(OrdersCountOnPage)
                 .ToListAsync();
 
@@ -122,11 +143,6 @@ namespace WebApplicationExercise.Services
             Db.Entry(order).State = EntityState.Deleted;
 
             await Db.SaveChangesAsync();
-        }
-
-        private IQueryable<Order> AddClause(IQueryable<Order> query)
-        {
-            return query.Where(o => o.Customer == "123");
         }
 
         private static IQueryable<Order> FilterByCustomer(IQueryable<Order> orders, string customerName)

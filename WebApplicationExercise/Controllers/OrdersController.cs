@@ -41,16 +41,18 @@ namespace WebApplicationExercise.Controllers
         /// <summary>
         ///     Get all orders with optional filtering by date and customer name
         /// </summary>
+        /// <param name="pageNumber">Page number</param>
+        /// <param name="sortOrder">customer_name[_desc] ; created_date[_desc]</param>
         /// <param name="from">Date from</param>
         /// <param name="to">Date to</param>
         /// <param name="customerName"></param>
         /// <returns></returns>
         [HttpGet]
         [Route]
-        public async Task<List<OrderModel>> GetOrders(int pageNumber, DateTime? from = null, DateTime? to = null,
-            string customerName = null)
+        public async Task<List<OrderModel>> GetOrders(int pageNumber, string sortOrder = null, DateTime? from = null,
+            DateTime? to = null, string customerName = null)
         {
-            return await _orderService.All(pageNumber, from, to, customerName);
+            return await _orderService.All(pageNumber, sortOrder, from, to, customerName);
         }
 
         /// <summary>

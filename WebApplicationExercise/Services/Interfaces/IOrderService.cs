@@ -9,7 +9,7 @@ namespace WebApplicationExercise.Services.Interfaces
     {
         Task<OrderModel> Single(Guid orderId);
         Task<OrderModel> Save(OrderModel orderModel);
-        Task<List<OrderModel>> All(int pageNumber, DateTime? @from, DateTime? to, string customerName);
+        Task<List<OrderModel>> All(int pageNumber, string sortOrder, DateTime? @from, DateTime? to, string customerName);
         Task Delete(Guid orderId);
         Task<OrderModel> Update(Guid orderId, OrderModel orderModel);
     }
