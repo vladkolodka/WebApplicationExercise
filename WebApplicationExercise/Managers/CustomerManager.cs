@@ -1,9 +1,10 @@
-﻿using System.Linq;
-using WebApplicationExercise.Managers.Interfaces;
-using WebApplicationExercise.Models;
-
-namespace WebApplicationExercise.Managers
+﻿namespace WebApplicationExercise.Managers
 {
+    using System.Linq;
+
+    using WebApplicationExercise.Managers.Interfaces;
+    using WebApplicationExercise.Models;
+
     // TODO ask if it would be better to convert manager to extensions class to increase linq readability
     public class CustomerManager : ICustomerManager
     {

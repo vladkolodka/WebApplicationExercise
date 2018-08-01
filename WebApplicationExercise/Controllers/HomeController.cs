@@ -1,16 +1,17 @@
-﻿using System.Web.Mvc;
-using NLog;
-
-namespace WebApplicationExercise.Controllers
+﻿namespace WebApplicationExercise.Controllers
 {
+    using System.Web.Mvc;
+
+    using NLog;
+
     public class HomeController : Controller
     {
         public ActionResult Index()
         {
             LogManager.GetCurrentClassLogger().Log(LogLevel.Info, "test test test");
-            ViewBag.Title = "Home Page";
+            this.ViewBag.Title = "Home Page";
 
-            return View();
+            return this.View();
         }
     }
 }

@@ -1,10 +1,11 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using WebApplicationExercise.Utils;
-
-namespace WebApplicationExercise.Models
+﻿namespace WebApplicationExercise.Models
 {
+    using System;
+    using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
+
+    using WebApplicationExercise.Utils;
+
     public abstract class SequentialIdEntity : ISequentialIdEntity
     {
         [Key]
@@ -13,7 +14,10 @@ namespace WebApplicationExercise.Models
 
         public void GenerateId()
         {
-            if (Id == Guid.Empty) Id = SequentialGuid.Next;
+            if (this.Id == Guid.Empty)
+            {
+                this.Id = SequentialGuid.Next;
+            }
         }
     }
 }

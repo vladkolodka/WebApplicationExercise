@@ -1,17 +1,19 @@
-﻿using AutoMapper;
-using WebApplicationExercise.Core;
-
-namespace WebApplicationExercise.Services
+﻿namespace WebApplicationExercise.Services
 {
+    using AutoMapper;
+
+    using WebApplicationExercise.Core;
+
     public class BaseService
     {
         public BaseService(MainDataContext db, IMapper mapper)
         {
-            Db = db;
-            Mapper = mapper;
+            this.Db = db;
+            this.Mapper = mapper;
         }
 
         public MainDataContext Db { get; }
+
         public IMapper Mapper { get; }
     }
 }

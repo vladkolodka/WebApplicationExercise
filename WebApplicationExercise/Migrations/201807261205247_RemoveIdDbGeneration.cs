@@ -1,31 +1,31 @@
-using System.Data.Entity.Migrations;
-
 namespace WebApplicationExercise.Migrations
 {
+    using System.Data.Entity.Migrations;
+
     public partial class RemoveIdDbGeneration : DbMigration
     {
-        public override void Up()
-        {
-            DropForeignKey("dbo.Products", "Order_Id", "dbo.Orders");
-            DropPrimaryKey("dbo.Orders");
-            DropPrimaryKey("dbo.Products");
-            AlterColumn("dbo.Orders", "Id", c => c.Guid(false));
-            AlterColumn("dbo.Products", "Id", c => c.Guid(false));
-            AddPrimaryKey("dbo.Orders", "Id");
-            AddPrimaryKey("dbo.Products", "Id");
-            AddForeignKey("dbo.Products", "Order_Id", "dbo.Orders", "Id", true);
-        }
-
         public override void Down()
         {
-            DropForeignKey("dbo.Products", "Order_Id", "dbo.Orders");
-            DropPrimaryKey("dbo.Products");
-            DropPrimaryKey("dbo.Orders");
-            AlterColumn("dbo.Products", "Id", c => c.Guid(false, true));
-            AlterColumn("dbo.Orders", "Id", c => c.Guid(false, true));
-            AddPrimaryKey("dbo.Products", "Id");
-            AddPrimaryKey("dbo.Orders", "Id");
-            AddForeignKey("dbo.Products", "Order_Id", "dbo.Orders", "Id", true);
+            this.DropForeignKey("dbo.Products", "Order_Id", "dbo.Orders");
+            this.DropPrimaryKey("dbo.Products");
+            this.DropPrimaryKey("dbo.Orders");
+            this.AlterColumn("dbo.Products", "Id", c => c.Guid(false, true));
+            this.AlterColumn("dbo.Orders", "Id", c => c.Guid(false, true));
+            this.AddPrimaryKey("dbo.Products", "Id");
+            this.AddPrimaryKey("dbo.Orders", "Id");
+            this.AddForeignKey("dbo.Products", "Order_Id", "dbo.Orders", "Id", true);
+        }
+
+        public override void Up()
+        {
+            this.DropForeignKey("dbo.Products", "Order_Id", "dbo.Orders");
+            this.DropPrimaryKey("dbo.Orders");
+            this.DropPrimaryKey("dbo.Products");
+            this.AlterColumn("dbo.Orders", "Id", c => c.Guid(false));
+            this.AlterColumn("dbo.Products", "Id", c => c.Guid(false));
+            this.AddPrimaryKey("dbo.Orders", "Id");
+            this.AddPrimaryKey("dbo.Products", "Id");
+            this.AddForeignKey("dbo.Products", "Order_Id", "dbo.Orders", "Id", true);
         }
     }
 }

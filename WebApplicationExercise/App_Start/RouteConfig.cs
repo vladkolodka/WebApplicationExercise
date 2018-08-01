@@ -1,8 +1,8 @@
-﻿using System.Web.Mvc;
-using System.Web.Routing;
-
-namespace WebApplicationExercise
+﻿namespace WebApplicationExercise
 {
+    using System.Web.Mvc;
+    using System.Web.Routing;
+
     public class RouteConfig
     {
         public static void RegisterRoutes(RouteCollection routes)
@@ -12,8 +12,7 @@ namespace WebApplicationExercise
             routes.MapRoute(
                 "Default",
                 "{controller}/{action}/{id}",
-                new {controller = "Home", action = "Index", id = UrlParameter.Optional}
-            );
+                new { controller = "Home", action = "Index", id = UrlParameter.Optional });
         }
     }
 }

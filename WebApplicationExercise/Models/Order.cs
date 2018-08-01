@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-
-namespace WebApplicationExercise.Models
+﻿namespace WebApplicationExercise.Models
 {
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
+
     public class Order : SequentialIdEntity
     {
         public DateTime CreatedDate { get; set; }

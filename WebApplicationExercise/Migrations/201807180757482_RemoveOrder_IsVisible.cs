@@ -1,17 +1,17 @@
-using System.Data.Entity.Migrations;
-
 namespace WebApplicationExercise.Migrations
 {
+    using System.Data.Entity.Migrations;
+
     public partial class RemoveOrder_IsVisible : DbMigration
     {
-        public override void Up()
-        {
-            DropColumn("dbo.Orders", "IsVisible");
-        }
-
         public override void Down()
         {
-            AddColumn("dbo.Orders", "IsVisible", c => c.Boolean(false));
+            this.AddColumn("dbo.Orders", "IsVisible", c => c.Boolean(false));
+        }
+
+        public override void Up()
+        {
+            this.DropColumn("dbo.Orders", "IsVisible");
         }
     }
 }

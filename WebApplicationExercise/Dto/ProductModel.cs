@@ -1,8 +1,8 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-
-namespace WebApplicationExercise.Dto
+﻿namespace WebApplicationExercise.Dto
 {
+    using System;
+    using System.ComponentModel.DataAnnotations;
+
     public class ProductModel
     {
         public Guid Id { get; set; }

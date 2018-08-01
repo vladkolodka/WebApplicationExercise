@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Web.Http;
-using WebApplicationExercise.Dto;
-using WebApplicationExercise.Services.Interfaces;
-
-namespace WebApplicationExercise.Controllers
+﻿namespace WebApplicationExercise.Controllers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using System.Web.Http;
+
+    using WebApplicationExercise.Dto;
+    using WebApplicationExercise.Services.Interfaces;
+
     /// <inheritdoc />
     /// <summary>
     ///     Manage orders
@@ -14,7 +15,7 @@ namespace WebApplicationExercise.Controllers
     [RoutePrefix("api/v1/orders")]
     public class OrdersController : ApiController
     {
-        private readonly IOrderService _orderService;
+        private readonly IOrderService orderService;
 
         /// <inheritdoc />
         /// <summary>
@@ -23,7 +24,19 @@ namespace WebApplicationExercise.Controllers
         /// <param name="orderService"></param>
         public OrdersController(IOrderService orderService)
         {
-            _orderService = orderService;
+            this.orderService = orderService;
+        }
+
+        /// <summary>
+        ///     Delete order
+        /// </summary>
+        /// <param name="orderId">Order identifier</param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("{orderId}")]
+        public async Task DeleteOrder(Guid orderId)
+        {
+            await this.orderService.Delete(orderId);
         }
 
         /// <summary>
@@ -35,7 +48,7 @@ namespace WebApplicationExercise.Controllers
         [Route("{orderId}")]
         public async Task<OrderModel> GetOrder(Guid orderId)
         {
-            return await _orderService.Single(orderId);
+            return await this.orderService.Single(orderId);
         }
 
         /// <summary>
@@ -49,10 +62,14 @@ namespace WebApplicationExercise.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route]
-        public async Task<List<OrderModel>> GetOrders(int pageNumber, string sortOrder = null, DateTime? from = null,
-            DateTime? to = null, string customerName = null)
+        public async Task<List<OrderModel>> GetOrders(
+            int pageNumber,
+            string sortOrder = null,
+            DateTime? from = null,
+            DateTime? to = null,
+            string customerName = null)
         {
-            return await _orderService.All(pageNumber, sortOrder, from, to, customerName);
+            return await this.orderService.All(pageNumber, sortOrder, from, to, customerName);
         }
 
         /// <summary>
@@ -64,19 +81,7 @@ namespace WebApplicationExercise.Controllers
         [Route]
         public async Task<OrderModel> SaveOrder([FromBody] OrderModel order)
         {
-            return await _orderService.Save(order);
-        }
-
-        /// <summary>
-        ///     Delete order
-        /// </summary>
-        /// <param name="orderId">Order identifier</param>
-        /// <returns></returns>
-        [HttpDelete]
-        [Route("{orderId}")]
-        public async Task DeleteOrder(Guid orderId)
-        {
-            await _orderService.Delete(orderId);
+            return await this.orderService.Save(order);
         }
 
         /// <summary>
@@ -89,7 +94,7 @@ namespace WebApplicationExercise.Controllers
         [Route("{orderId}")]
         public async Task<OrderModel> UpdateOrder(Guid orderId, [FromBody] OrderModel order)
         {
-            return await _orderService.Update(orderId, order);
+            return await this.orderService.Update(orderId, order);
         }
     }
 }

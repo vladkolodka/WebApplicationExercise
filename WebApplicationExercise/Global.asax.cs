@@ -1,16 +1,21 @@
-﻿using System.Web;
-using System.Web.Http;
-using System.Web.Http.Tracing;
-using System.Web.Mvc;
-using System.Web.Optimization;
-using System.Web.Routing;
-using WebApplicationExercise.Core;
-using WebApplicationExercise.Services.Logging;
-
-namespace WebApplicationExercise
+﻿namespace WebApplicationExercise
 {
+    using System.Web;
+    using System.Web.Http;
+    using System.Web.Http.Tracing;
+    using System.Web.Mvc;
+    using System.Web.Optimization;
+    using System.Web.Routing;
+
+    using WebApplicationExercise.Core;
+    using WebApplicationExercise.Services.Logging;
+
     public class WebApiApplication : HttpApplication
     {
+        protected void Application_BeginRequest()
+        {
+        }
+
         protected void Application_Start()
         {
             GlobalConfiguration.Configuration.Services.Replace(typeof(ITraceWriter), new NLogger());
@@ -22,10 +27,6 @@ namespace WebApplicationExercise
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
-        }
-
-        protected void Application_BeginRequest()
-        {
         }
     }
 }
