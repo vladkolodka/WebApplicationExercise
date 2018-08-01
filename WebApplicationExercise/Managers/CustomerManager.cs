@@ -4,6 +4,7 @@ using WebApplicationExercise.Models;
 
 namespace WebApplicationExercise.Managers
 {
+    // TODO ask if it would be better to convert manager to extensions class to increase linq readability
     public class CustomerManager : ICustomerManager
     {
         private const string HiddenCustomerName = "Hidden Joe";

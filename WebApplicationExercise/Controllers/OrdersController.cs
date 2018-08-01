@@ -47,10 +47,10 @@ namespace WebApplicationExercise.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route]
-        public async Task<List<OrderModel>> GetOrders(DateTime? from = null, DateTime? to = null,
+        public async Task<List<OrderModel>> GetOrders(int pageNumber, DateTime? from = null, DateTime? to = null,
             string customerName = null)
         {
-            return await _orderService.All(from, to, customerName);
+            return await _orderService.All(pageNumber, from, to, customerName);
         }
 
         /// <summary>

@@ -17,6 +17,8 @@ namespace WebApplicationExercise.Services
     /// </summary>
     public class OrderService : BaseService, IOrderService
     {
+        // TODO to ask if it should be in the config
+        private const int OrdersCountOnPage = 2;
         private readonly ICustomerManager _manager;
 
         /// <param name="db">Database context</param>
@@ -38,7 +40,7 @@ namespace WebApplicationExercise.Services
                 .FirstOrDefaultAsync(o => o.Id == orderId));
         }
 
-        /// <summary>
+        /// <summary> 
         ///     Create new order
         /// </summary>
         /// <param name="orderModel"></param>
@@ -79,11 +81,12 @@ namespace WebApplicationExercise.Services
         /// <summary>
         ///     Get all orders with optional filtering
         /// </summary>
+        /// <param name="pageNumber"></param>
         /// <param name="from"></param>
         /// <param name="to"></param>
         /// <param name="customerName"></param>
         /// <returns></returns>
-        public async Task<List<OrderModel>> All(DateTime? from, DateTime? to, string customerName)
+        public async Task<List<OrderModel>> All(int pageNumber, DateTime? @from, DateTime? to, string customerName)
         {
             var orders = Db.Orders.Include(o => o.Products).AsNoTracking();
 
@@ -93,7 +96,15 @@ namespace WebApplicationExercise.Services
             if (customerName != null)
                 orders = FilterByCustomer(orders, customerName);
 
-            return Mapper.Map<List<OrderModel>>(await _manager.IsCustomerVisible(orders).ToListAsync());
+            var request = await _manager.IsCustomerVisible(orders)
+                
+                // TODO default OrderBy if not specified
+                .OrderBy(o => o.CreatedDate)
+                
+                .Skip(OrdersCountOnPage * pageNumber).Take(OrdersCountOnPage)
+                .ToListAsync();
+
+            return Mapper.Map<List<OrderModel>>(request);
         }
 
         /// <summary>
