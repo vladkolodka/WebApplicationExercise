@@ -8,7 +8,7 @@
 
     using WebApplicationExercise.Services.Interfaces;
 
-    public class CurrencyConverterService : BaseService, ICurrencyConverterService
+    public class CurrencyConverterService : ICurrencyConverterService
     {
         private const string ApiUrl = "https://free.currencyconverterapi.com/api/v6/";
 
@@ -22,7 +22,6 @@
         /// <param name="db">Database context</param>
         /// <param name="mapper">DTO mapper</param>
         public CurrencyConverterService()
-            : base(null, null)
         {
             this.client = new HttpClient { BaseAddress = new Uri(ApiUrl) };
         }
