@@ -2,8 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Data.SqlClient;
     using System.Threading.Tasks;
     using System.Web.Http;
+
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Converters;
 
     using WebApplicationExercise.Dto;
     using WebApplicationExercise.Services.Interfaces;
@@ -55,9 +59,11 @@
         /// <summary>
         ///     Get all orders with optional filtering by date and customer name
         /// </summary>
-        /// <param name="pageNumber">Page number</param>
+        /// <param name="direction">Sorting direction</param>
+        /// <param name="offset">Retrieved items offset</param>
+        /// <param name="count">Retrieved items count</param>
         /// <param name="currency">Convert to currency, ex: UAH</param>
-        /// <param name="sortOrder">customer_name[_desc] ; created_date[_desc]</param>
+        /// <param name="sortOrder">Customer/CreatedDate/...</param>
         /// <param name="from">Date from</param>
         /// <param name="to">Date to</param>
         /// <param name="customerName"></param>
@@ -65,14 +71,16 @@
         [HttpGet]
         [Route]
         public async Task<List<OrderModel>> GetOrders(
-            int pageNumber = 0,
+            SortOrder direction,
+            int offset = 0,
+            int count = 10,
             string currency = null,
             string sortOrder = null,
             DateTime? from = null,
             DateTime? to = null,
             string customerName = null)
         {
-            return await this.orderService.All(pageNumber, currency, sortOrder, from, to, customerName);
+            return await this.orderService.All(offset, count, currency, sortOrder, direction, from, to, customerName);
         }
 
         /// <summary>

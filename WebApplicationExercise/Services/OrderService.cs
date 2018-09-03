@@ -1,27 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Threading.Tasks;
-
-using AutoMapper;
-
-using WebApplicationExercise.Core;
-using WebApplicationExercise.Dto;
-using WebApplicationExercise.Managers.Interfaces;
-using WebApplicationExercise.Models;
-using WebApplicationExercise.Services.Interfaces;
-
-namespace WebApplicationExercise.Services
+﻿namespace WebApplicationExercise.Services
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Data.Entity;
+    using System.Data.SqlClient;
+    using System.Linq;
+    using System.Threading.Tasks;
+
+    using AutoMapper;
+
+    using WebApplicationExercise.Core;
+    using WebApplicationExercise.Dto;
+    using WebApplicationExercise.Managers.Interfaces;
+    using WebApplicationExercise.Models;
+    using WebApplicationExercise.Services.Interfaces;
+    using WebApplicationExercise.Utils;
+
     /// <summary>
     ///     Manages orders their products
     /// </summary>
     public class OrderService : BaseService, IOrderService
     {
-        // TODO to ask if it should be in the config
-        private const int OrdersCountOnPage = 2;
-
         private readonly ICurrencyConverterService currencyConverterService;
 
         private readonly ICustomerManager manager;
@@ -44,22 +43,31 @@ namespace WebApplicationExercise.Services
         /// <summary>
         ///     Get all orders with optional filtering
         /// </summary>
-        /// <param name="pageNumber"></param>
+        /// <param name="offset"></param>
+        /// <param name="count"></param>
         /// <param name="currency"></param>
         /// <param name="sortOrder"></param>
+        /// <param name="direction"></param>
         /// <param name="from"></param>
         /// <param name="to"></param>
         /// <param name="customerName"></param>
         /// <returns></returns>
         public async Task<List<OrderModel>> All(
-            int pageNumber,
+            int offset,
+            int count,
             string currency,
             string sortOrder,
+            SortOrder direction,
             DateTime? @from,
             DateTime? to,
             string customerName)
         {
-            var orders = Db.Orders.Include(o => o.Products).AsNoTracking();
+            if (count > 50)
+            {
+                throw new ArgumentOutOfRangeException(nameof(count));
+            }
+
+            var orders = this.Db.Orders.Include(o => o.Products).AsNoTracking();
 
             if (from != null && to != null)
             {
@@ -71,35 +79,23 @@ namespace WebApplicationExercise.Services
                 orders = FilterByCustomer(orders, customerName);
             }
 
-            // TODO consider convert to: orders = Dictionary<Delegate>[](orders) in case if new fields will be added
-            switch (sortOrder?.ToLower())
+            if (sortOrder != null)
             {
-                case "customer_name":
-                    orders = orders.OrderBy(o => o.Customer);
-                    break;
-
-                case "created_date":
-                    orders = orders.OrderBy(o => o.CreatedDate);
-                    break;
-                case "customer_name_desc":
-                    orders = orders.OrderByDescending(o => o.Customer);
-                    break;
-
-                case "created_date_desc":
-                    orders = orders.OrderByDescending(o => o.CreatedDate);
-                    break;
-                default:
-                    orders = orders.OrderBy(o => o.Id);
-                    break;
+                orders = direction == SortOrder.Descending
+                             ? orders.OrderByDescending(sortOrder)
+                             : orders.OrderBy(sortOrder);
+            }
+            else
+            {
+                orders = orders.OrderBy(o => o.Id);
             }
 
-            var result = Mapper.Map<List<OrderModel>>(
-                await manager.IsCustomerVisible(orders).Skip(OrdersCountOnPage * pageNumber).Take(OrdersCountOnPage)
-                    .ToListAsync());
+            var result = this.Mapper.Map<List<OrderModel>>(
+                await this.manager.IsCustomerVisible(orders).Skip(offset).Take(count).ToListAsync());
 
             if (currency != null)
             {
-                await ConvertPrice(currency, result);
+                await this.ConvertPrice(currency, result);
             }
 
             return result;
@@ -112,17 +108,17 @@ namespace WebApplicationExercise.Services
         /// <returns></returns>
         public async Task Delete(Guid orderId)
         {
-            if (!await Db.Orders.AnyAsync(o => o.Id == orderId))
+            if (!await this.Db.Orders.AnyAsync(o => o.Id == orderId))
             {
                 return;
             }
 
             var order = new Order { Id = orderId };
 
-            Db.Orders.Attach(order);
-            Db.Entry(order).State = EntityState.Deleted;
+            this.Db.Orders.Attach(order);
+            this.Db.Entry(order).State = EntityState.Deleted;
 
-            await Db.SaveChangesAsync();
+            await this.Db.SaveChangesAsync();
         }
 
         /// <summary>
@@ -132,13 +128,13 @@ namespace WebApplicationExercise.Services
         /// <returns></returns>
         public async Task<OrderModel> Save(OrderModel orderModel)
         {
-            var order = Mapper.Map<Order>(orderModel);
+            var order = this.Mapper.Map<Order>(orderModel);
 
-            var savedOrder = Db.Orders.Add(order);
+            var savedOrder = this.Db.Orders.Add(order);
 
-            await Db.SaveChangesAsync();
+            await this.Db.SaveChangesAsync();
 
-            return Mapper.Map<OrderModel>(savedOrder);
+            return this.Mapper.Map<OrderModel>(savedOrder);
         }
 
         /// <summary>
@@ -150,12 +146,12 @@ namespace WebApplicationExercise.Services
         public async Task<OrderModel> Single(Guid orderId, string currency)
         {
             // single throws exception when entity doesnt exists.
-            var result = Mapper.Map<OrderModel>(
-                await Db.Orders.Include(o => o.Products).AsNoTracking().FirstOrDefaultAsync(o => o.Id == orderId));
+            var result = this.Mapper.Map<OrderModel>(
+                await this.Db.Orders.Include(o => o.Products).AsNoTracking().FirstOrDefaultAsync(o => o.Id == orderId));
 
             if (currency != null)
             {
-                await ConvertPrice(currency, new[] { result });
+                await this.ConvertPrice(currency, new[] { result });
             }
 
             return result;
@@ -170,20 +166,20 @@ namespace WebApplicationExercise.Services
         /// <exception cref="ArgumentException"></exception>
         public async Task<OrderModel> Update(Guid orderId, OrderModel orderModel)
         {
-            var databaseOrder = await Db.Orders.Include(o => o.Products).FirstOrDefaultAsync(o => o.Id == orderId);
+            var databaseOrder = await this.Db.Orders.Include(o => o.Products).FirstOrDefaultAsync(o => o.Id == orderId);
 
             if (databaseOrder == null)
             {
                 throw new ArgumentException("Order not found");
             }
 
-            Db.Orders.Remove(databaseOrder);
+            this.Db.Orders.Remove(databaseOrder);
 
-            var newDbOrder = Db.Orders.Add(Mapper.Map<Order>(orderModel));
+            var newDbOrder = this.Db.Orders.Add(this.Mapper.Map<Order>(orderModel));
 
-            await Db.SaveChangesAsync();
+            await this.Db.SaveChangesAsync();
 
-            return Mapper.Map<OrderModel>(newDbOrder);
+            return this.Mapper.Map<OrderModel>(newDbOrder);
         }
 
         private static IQueryable<Order> FilterByCustomer(IQueryable<Order> orders, string customerName)
@@ -203,7 +199,7 @@ namespace WebApplicationExercise.Services
         /// <param name="orders"></param>
         private async Task ConvertPrice(string targetCurrency, IEnumerable<OrderModel> orders)
         {
-            var targetPrice = await currencyConverterService.GetUsdExchangeRate(targetCurrency);
+            var targetPrice = await this.currencyConverterService.GetUsdExchangeRate(targetCurrency);
 
             foreach (var order in orders)
             {

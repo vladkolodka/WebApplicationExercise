@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Data.SqlClient;
     using System.Threading.Tasks;
 
     using WebApplicationExercise.Dto;
@@ -9,9 +10,11 @@
     public interface IOrderService
     {
         Task<List<OrderModel>> All(
-            int pageNumber,
+            int offset,
+            int count,
             string currency,
             string sortOrder,
+            SortOrder direction,
             DateTime? @from,
             DateTime? to,
             string customerName);

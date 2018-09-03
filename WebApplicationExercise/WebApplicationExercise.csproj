@@ -247,6 +247,7 @@
     <Compile Include="Services\Interfaces\IOrderService.cs" />
     <Compile Include="Services\Logging\NLogger.cs" />
     <Compile Include="Services\OrderService.cs" />
+    <Compile Include="Utils\QueryableExtensions.cs" />
     <Compile Include="Utils\SequentialGuid.cs" />
   </ItemGroup>
   <ItemGroup>
