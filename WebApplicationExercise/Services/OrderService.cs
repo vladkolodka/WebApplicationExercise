@@ -1,19 +1,19 @@
-﻿namespace WebApplicationExercise.Services
+﻿using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Threading.Tasks;
+
+using AutoMapper;
+
+using WebApplicationExercise.Core;
+using WebApplicationExercise.Dto;
+using WebApplicationExercise.Managers.Interfaces;
+using WebApplicationExercise.Models;
+using WebApplicationExercise.Services.Interfaces;
+
+namespace WebApplicationExercise.Services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Data.Entity;
-    using System.Linq;
-    using System.Threading.Tasks;
-
-    using AutoMapper;
-
-    using WebApplicationExercise.Core;
-    using WebApplicationExercise.Dto;
-    using WebApplicationExercise.Managers.Interfaces;
-    using WebApplicationExercise.Models;
-    using WebApplicationExercise.Services.Interfaces;
-
     /// <summary>
     ///     Manages orders their products
     /// </summary>
@@ -59,7 +59,7 @@
             DateTime? to,
             string customerName)
         {
-            var orders = this.Db.Orders.Include(o => o.Products).AsNoTracking();
+            var orders = Db.Orders.Include(o => o.Products).AsNoTracking();
 
             if (from != null && to != null)
             {
@@ -93,13 +93,13 @@
                     break;
             }
 
-            var result = this.Mapper.Map<List<OrderModel>>(
-                await this.manager.IsCustomerVisible(orders).Skip(OrdersCountOnPage * pageNumber)
-                    .Take(OrdersCountOnPage).ToListAsync());
+            var result = Mapper.Map<List<OrderModel>>(
+                await manager.IsCustomerVisible(orders).Skip(OrdersCountOnPage * pageNumber).Take(OrdersCountOnPage)
+                    .ToListAsync());
 
             if (currency != null)
             {
-                await this.ConvertPrice(currency, result);
+                await ConvertPrice(currency, result);
             }
 
             return result;
@@ -112,17 +112,17 @@
         /// <returns></returns>
         public async Task Delete(Guid orderId)
         {
-            if (!await this.Db.Orders.AnyAsync(o => o.Id == orderId))
+            if (!await Db.Orders.AnyAsync(o => o.Id == orderId))
             {
                 return;
             }
 
             var order = new Order { Id = orderId };
 
-            this.Db.Orders.Attach(order);
-            this.Db.Entry(order).State = EntityState.Deleted;
+            Db.Orders.Attach(order);
+            Db.Entry(order).State = EntityState.Deleted;
 
-            await this.Db.SaveChangesAsync();
+            await Db.SaveChangesAsync();
         }
 
         /// <summary>
@@ -132,13 +132,13 @@
         /// <returns></returns>
         public async Task<OrderModel> Save(OrderModel orderModel)
         {
-            var order = this.Mapper.Map<Order>(orderModel);
+            var order = Mapper.Map<Order>(orderModel);
 
-            var savedOrder = this.Db.Orders.Add(order);
+            var savedOrder = Db.Orders.Add(order);
 
-            await this.Db.SaveChangesAsync();
+            await Db.SaveChangesAsync();
 
-            return this.Mapper.Map<OrderModel>(savedOrder);
+            return Mapper.Map<OrderModel>(savedOrder);
         }
 
         /// <summary>
@@ -150,12 +150,12 @@
         public async Task<OrderModel> Single(Guid orderId, string currency)
         {
             // single throws exception when entity doesnt exists.
-            var result = this.Mapper.Map<OrderModel>(
-                await this.Db.Orders.Include(o => o.Products).AsNoTracking().FirstOrDefaultAsync(o => o.Id == orderId));
+            var result = Mapper.Map<OrderModel>(
+                await Db.Orders.Include(o => o.Products).AsNoTracking().FirstOrDefaultAsync(o => o.Id == orderId));
 
             if (currency != null)
             {
-                await this.ConvertPrice(currency, new[] { result });
+                await ConvertPrice(currency, new[] { result });
             }
 
             return result;
@@ -170,20 +170,20 @@
         /// <exception cref="ArgumentException"></exception>
         public async Task<OrderModel> Update(Guid orderId, OrderModel orderModel)
         {
-            var databaseOrder = await this.Db.Orders.Include(o => o.Products).FirstOrDefaultAsync(o => o.Id == orderId);
+            var databaseOrder = await Db.Orders.Include(o => o.Products).FirstOrDefaultAsync(o => o.Id == orderId);
 
             if (databaseOrder == null)
             {
                 throw new ArgumentException("Order not found");
             }
 
-            this.Db.Orders.Remove(databaseOrder);
+            Db.Orders.Remove(databaseOrder);
 
-            var newDbOrder = this.Db.Orders.Add(this.Mapper.Map<Order>(orderModel));
+            var newDbOrder = Db.Orders.Add(Mapper.Map<Order>(orderModel));
 
-            await this.Db.SaveChangesAsync();
+            await Db.SaveChangesAsync();
 
-            return this.Mapper.Map<OrderModel>(newDbOrder);
+            return Mapper.Map<OrderModel>(newDbOrder);
         }
 
         private static IQueryable<Order> FilterByCustomer(IQueryable<Order> orders, string customerName)
@@ -203,7 +203,7 @@
         /// <param name="orders"></param>
         private async Task ConvertPrice(string targetCurrency, IEnumerable<OrderModel> orders)
         {
-            var targetPrice = await this.currencyConverterService.ConvertUsd(targetCurrency);
+            var targetPrice = await currencyConverterService.GetUsdExchangeRate(targetCurrency);
 
             foreach (var order in orders)
             {

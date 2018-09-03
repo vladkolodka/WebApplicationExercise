@@ -10,6 +10,6 @@
         /// <param name="currency">Target currency name</param>
         /// <example>ContertUsd("UAH")</example>
         /// <returns></returns>
-        Task<double> ConvertUsd(string currency);
+        Task<double> GetUsdExchangeRate(string currency);
     }
 }
