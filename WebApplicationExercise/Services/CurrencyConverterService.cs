@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 
 using Newtonsoft.Json.Linq;
 
-using WebApplicationExercise.Models;
 using WebApplicationExercise.Services.Interfaces;
 
 namespace WebApplicationExercise.Services
@@ -31,10 +30,9 @@ namespace WebApplicationExercise.Services
         {
             var cache = MemoryCache.Default;
 
-            if (cache.Contains(currency) && cache[currency] is CachedCurrencyRate rate
-                                         && DateTime.Now - rate.LastUpdateDateTime <= TimeSpan.FromMinutes(5))
+            if (cache.Contains(currency))
             {
-                return rate.Rate;
+                return (double)cache[currency];
             }
 
             var convertQuery = $"{SourceCurrency}_{currency.ToUpper()}";
@@ -43,7 +41,7 @@ namespace WebApplicationExercise.Services
 
             var newRate = JObject.Parse(await result.Content.ReadAsStringAsync())[convertQuery].Value<double>();
 
-            cache[currency] = new CachedCurrencyRate { Rate = newRate, LastUpdateDateTime = DateTime.Now };
+            cache.Add(currency, newRate, DateTimeOffset.Now.AddMinutes(5));
 
             return newRate;
         }
